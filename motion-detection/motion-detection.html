@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Motion Detection</title>
+
+    <!--Style kann in ein Stylesheet ausgelagert werden-->
+    <style>
+        body {
+            margin: 20px;
+            font: 1.5em/1.2 sans-serif;
+            text-align: center;
+        }
+
+        figure {
+            display: inline-block;
+            margin: 10px;
+            vertical-align: top;
+        }
+
+        figcaption {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        video, canvas {
+            width: 480px;
+            height: 360px;
+            background-color: #999;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+        }
+    </style>
+
+</head>
+<body>
+
+<figure>
+    <video id="video"></video>
+    <figcaption>Live Video</figcaption>
+</figure>
+
+<figure>
+    <canvas id="motion"></canvas>
+    <figcaption>
+        Motion Heatmap<br>
+        Score: <span id="score">?</span>
+    </figcaption>
+</figure>
+
+<button onclick="takePhoto()">Foto erstellen</button>
+
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="./js/diff-cam-engine.js"></script>
+<script>
+    //Referenz zu den HTML Elementen durch die ID:
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('motion');
+    var score = document.getElementById('score');
+
+    //Aufruf, wenn Initialisierung erfolgreich abgeschlossen wurde
+    function initSuccess() {
+        DiffCamEngine.start();
+    }
+
+    //Aufruf bei Fehler während Initialisierung
+    function initError(err) {
+        alert(err.message);
+    }
+
+    //Aufruf, wenn ein aufgenommenes Bild durch den stream (von getUserMedia in der DiffCamEngine) ausgewertet wurde
+    function capture(payload) {
+        //payload.score gibt den "Motionscore" aus
+        //Bsp: Übersteigt dieser nun beispielsweise eine festgelegte Grenze, kann der Gast begrüßt und im Anschluss aufgezeichnet werden
+        score.textContent = payload.score;
+    }
+
+    //Initialisierung der Engine:
+    DiffCamEngine.init({
+        video: video,
+        motionCanvas: canvas,
+        initSuccessCallback: initSuccess,
+        initErrorCallback: initError,
+        captureCallback: capture
+    });
+
+    //Foto erstellen und downloaden
+    function takePhoto() {
+        const foto = document.createElement("canvas");
+        foto.width = video.offsetWidth;
+        foto.height = video.offsetHeight;
+        const context = foto.getContext('2d');
+        context.drawImage(video, 0, 0, video.offsetWidth, video.offsetHeight);
+
+        var url = foto.toDataURL("image/png");
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "my.png";
+        a.click();
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>voiceRss</h1>
+
+<script src="./js/voicerss-tts.min.js"></script>
+<script>
+    // sendet an VoiceRSS den Text, der in "src" steht
+    // VoiceRSS sendet die dazu passende Audio-Datei zurück
+    VoiceRSS.speech({
+        key: 'cfd596fcbbe34564ac52a71af9aa3de1',
+        src: 'Bitte halten Sie Ihren Ausweis drei Sekunden vor die Kamera um einzuchecken!',
+        hl: 'de-de',
+        v: 'Hanna',
+        r: 0,
+        c: 'mp3',
+        f: '44khz_16bit_stereo',
+        ssml: false
+    });
+
+    function redirectTo() {
+        console.log("redirect wurde aufgerufen...");
+
+        // Verlinkung zur nächsten Seite
+        // location.href = "";
+    }
+</script>
+</body>
+</html>
